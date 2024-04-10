@@ -1,10 +1,15 @@
 import streamlit as st
 import time
+import os
+from pathlib import Path
+import streamlit as st
+from pathlib import PurePath
+from cds_app.model import preproc
 
 
 st.set_page_config(
-    page_title = 'Sentimental Boys Project',
-    page_icon= "👦🏻",
+    page_title='Sentimental Boys Project',
+    page_icon="👦🏻",
 )
 
 st.title('The Sentimental Boys Project')
@@ -29,6 +34,14 @@ class howto():
     st.divider()
 
 class main():
+    def save_uploaded_file(uploaded_file):
+    # Define the directory where you want to save the uploaded file
+        save_dir = "../proc_csv/raw_videos"
+        os.makedirs(save_dir, exist_ok=True)
+        # Save the uploaded file with a unique name
+        with open(os.path.join(save_dir, uploaded_file.name), "wb") as f:
+            f.write(uploaded_file.getbuffer())
+            
     st.header("Please upload your video here")
     video_file = st.file_uploader('Upload',type=['mp4'])
 
@@ -38,10 +51,28 @@ class main():
             file_details = {"filename": video_file.name, "filetype": video_file.type, "filesize": video_file.size}
             st.write(file_details)
             video_bytes = video_file.read()
+
+            save_uploaded_file(video_file) #save file here
+
             st.video(video_bytes)
         if st.button('Process Video Now', on_click=None, type='primary'):
             with st.spinner('Processing Video...'):
+                audio = preproc.proc_audio('../proc_csv/raw_videos/{}'.format(video_file.name))
+                st.markdown(f"{audio}")
+                st.markdown("**The file is sucessfully Uploaded.**")
+                
+                # Save uploaded file to 'F:/tmp' folder.
+                save_folder = 'F:/tmp'
+                save_path = Path(save_folder, video_file.name)
+                with open(save_path, mode='wb') as w:
+                    w.write(video_file.getvalue())
+
+                if save_path.exists():
+                    st.success(f'File {video_file.name} is successfully saved!')
+
                 time.sleep(5)
+
+
                 st.write("Video Processed Successfully")
                 st.write("The Video Sentiment is:")
         
