@@ -1,5 +1,13 @@
 import streamlit as st
 import time
+<<<<<<< Updated upstream
+=======
+import os
+from pathlib import Path
+import streamlit as st
+from pathlib import PurePath
+from model import final, preproc
+>>>>>>> Stashed changes
 
 
 st.set_page_config(
@@ -41,8 +49,44 @@ class main():
             st.video(video_bytes)
         if st.button('Process Video Now', on_click=None, type='primary'):
             with st.spinner('Processing Video...'):
+<<<<<<< Updated upstream
                 time.sleep(5)
                 st.write("Video Processed Successfully")
                 st.write("The Video Sentiment is:")
         
+=======
+
+                # audio = preproc.proc_audio('../proc_csv/raw_videos/{}'.format(video_file.name))
+                # st.markdown(f"{audio}")
+                # st.markdown("**The audio is sucessfully Uploaded.**")
+
+                # face = preproc.proc_face('../proc_csv/raw_videos/{}'.format(video_file.name))
+                # st.markdown(f"{face}")
+                # st.markdown("**The facial is sucessfully Uploaded.**")
+                
+                
+
+                # text = preproc.proc_text('../proc_csv/raw_videos/{}'.format(video_file.name))
+                # st.markdown(f"{text}")
+                # st.markdown("**The text is sucessfully Uploaded.**")
+
+                video_path = '../proc_csv/raw_videos/{}'.format(video_file.name)
+                video_data = final.preprocess_video(video_path)
+                sentiment = final.predict_sentiment(video_path)
+                st.markdown(f"Video Processed Successfully! The video sentiment is: {sentiment}")
+
+        
+                # Save uploaded file to 'F:/tmp' folder.
+                save_folder = 'F:/tmp'
+                save_path = Path(save_folder, video_file.name)
+                with open(save_path, mode='wb') as w:
+                    w.write(video_file.getvalue())
+
+                if save_path.exists():
+                    st.success(f'File {video_file.name} is successfully saved!')
+
+                time.sleep(5)
+
+
+>>>>>>> Stashed changes
 
