@@ -77,17 +77,5 @@ class main():
                 sentiment = final.predict_sentiment(video_path)
                 st.markdown(f"Video Processed Successfully! The video sentiment is: {sentiment}")
 
-        
-                # Save uploaded file to 'F:/tmp' folder.
-                save_folder = 'F:/tmp'
-                save_path = Path(save_folder, video_file.name)
-                with open(save_path, mode='wb') as w:
-                    w.write(video_file.getvalue())
-
-                if save_path.exists():
-                    st.success(f'File {video_file.name} is successfully saved!')
-
-                time.sleep(5)
-
 
 
