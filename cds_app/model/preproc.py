@@ -10,9 +10,11 @@ from tensorflow.keras.models import Model
 
 import librosa
 from moviepy.editor import *
+import speech_recognition as sr
 
 import torch
 from transformers import BertTokenizer, BertModel
+
 
 def proc_audio(path):
     def calculate_hop_length(sr, ms):
@@ -57,9 +59,12 @@ def proc_audio(path):
 
         return features_mean, features_dict
     # Extract audio and save temporarily
-    audio_path = f"../temp"
+    # audio_path = f"../temp"
+    # video = VideoFileClip(path)
+    # video.audio.write_audiofile(audio_path,codec="pcm_s16le")
+    audio_path = f"temp_audio.wav"
     video = VideoFileClip(path)
-    video.audio.write_audiofile(audio_path)
+    video.audio.write_audiofile(audio_path,codec="pcm_s16le")
 
     # Extract features
     features_mean, features_dict = extract_audio_features(audio_path)
@@ -109,7 +114,33 @@ def proc_face(path):
         average_features = np.mean(features_per_frame, axis=0)
         return average_features
 
+# def proc_text(path):
+#     # Initialize the BERT tokenizer and model
+#     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+#     model = BertModel.from_pretrained('bert-base-uncased')
+
+#     # Function to encode text to BERT features with variable max_length
+#     def encode_text_for_bert(text, max_length):
+#         inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=max_length)
+#         with torch.no_grad():
+#             outputs = model(**inputs)
+#         embeddings = outputs.last_hidden_state
+#         feature_vector = torch.mean(embeddings, dim=1)
+#         return feature_vector.squeeze().cpu().numpy()
+#     bert_features = encode_text_for_bert(row['text'], 512)
+#     return bert_features
+
 def proc_text(path):
+    def extract_text():
+        # Initialize recognizer class                                       
+        r = sr.Recognizer()
+        # audio object                                                         
+        audio = sr.AudioFile("temp_audio.wav")
+        #read audio object and transcribe
+        with audio as source:
+            audio = r.record(source)                  
+            result = r.recognize_google(audio)
+        return result
     # Initialize the BERT tokenizer and model
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     model = BertModel.from_pretrained('bert-base-uncased')
@@ -122,7 +153,5 @@ def proc_text(path):
         embeddings = outputs.last_hidden_state
         feature_vector = torch.mean(embeddings, dim=1)
         return feature_vector.squeeze().cpu().numpy()
-    bert_features = encode_text_for_bert(row['text'], 512)
+    bert_features = encode_text_for_bert(extract_text(), 512)
     return bert_features
-
-    
